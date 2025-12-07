@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up Page</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #0663b9, #c3d6ff, #0c3f9d);
+      padding: 20px;
+    }
+
+    .container {
+      display: flex;
+      width: 95%;
+      max-width: 850px;
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Left Panel */
+    .left {
+      flex: 1;
+      background: linear-gradient(135deg, #2575fc, #6a11cb);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 40px 30px;
+      min-height: 380px;
+    }
+
+    .left h2 {
+      font-size: 1.9rem;
+      margin-bottom: 20px;
+    }
+
+    .left p {
+      margin-bottom: 25px;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .login-btn {
+      padding: 12px 30px;
+      background: #fff;
+      color: #2575fc;
+      border: none;
+      border-radius: 25px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .login-btn:hover {
+      background: #e9e9e9;
+      transform: scale(1.05);
+    }
+
+    /* Right Panel */
+    .right {
+      flex: 1;
+      padding: 50px 35px;
+      background: #f9fafc;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .right h2 {
+      margin-bottom: 25px;
+      color: #333;
+      text-align: center;
+      font-size: 1.8rem;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      outline: none;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .input-group input:focus {
+      border-color: #6a11cb;
+      box-shadow: 0 0 5px rgba(106, 17, 203, 0.3);
+    }
+
+    .password-msg {
+      font-size: 0.9rem;
+      margin-top: -10px;
+      margin-bottom: 15px;
+      font-weight: 500;
+    }
+
+    .weak { color: red; }
+    .strong { color: green; }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: #fff;
+      font-size: 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .btn:hover {
+      background: linear-gradient(135deg, #5d0cc0, #1f6afc);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .container {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .right {
+        padding: 40px 25px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .right h2, .left h2 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- Left Panel -->
+    <div class="left">
+      <h2>Welcome Back!</h2>
+      <p>If you already have an account, simply log in to continue your journey with us.</p>
+      <button class="login-btn" onclick="window.location.href='/'">Login</button>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right">
+      <h2>Create Account</h2>
+
+      <form action="/signup" method="post">
+        {% if otp_stage %}
+          <input type="hidden" name="name" value="{{name}}">
+          <input type="hidden" name="email" value="{{email}}">
+          <input type="hidden" name="password" value="{{password}}">
+
+          <div class="input-group">
+            <input type="text" name="otp" placeholder="Enter OTP" required maxlength="6" />
+          </div>
+
+          <button type="submit" class="btn">Verify OTP</button>
+
+        {% else %}
+          <div class="input-group">
+            <input type="text" name="name" id="name" placeholder="Full Name" required />
+          </div>
+
+          <div class="input-group">
+            <input type="email" name="email" id="email" placeholder="Email Address" required />
+          </div>
+
+          <div class="input-group">
+            <input type="password" name="password" id="password" placeholder="Password" onkeyup="checkPassword()" required />
+          </div>
+
+          <div class="password-msg" id="passwordMsg"></div>
+
+          <button type="submit" class="btn">Sign Up</button>
+        {% endif %}
+      </form>
+
+      <p>{{message}}</p>
+    </div>
+
+  </div>
+
+  <script>
+    function checkPassword() {
+      const password = document.getElementById("password").value;
+      const msg = document.getElementById("passwordMsg");
+      const strongPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+
+      if (password.length === 0) {
+        msg.textContent = "";
+      } else if (strongPattern.test(password)) {
+        msg.textContent = "✅ Strong password";
+        msg.className = "password-msg strong";
+      } else {
+        msg.textContent = "❌ Weak password — include upper & lower letters, numbers & symbols";
+        msg.className = "password-msg weak";
+      }
+    }
+  </script>
+
+</body>
+</html>

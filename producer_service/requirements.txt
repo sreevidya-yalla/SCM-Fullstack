@@ -1,0 +1,4 @@
+aiokafka
+motor
+pymongo
+python-dotenv

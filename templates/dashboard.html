@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+    }
+
+    body {
+        background: linear-gradient(135deg, #0f172a, #1e3a8a, #3b82f6);
+        padding: 28px;
+        overflow-x: hidden;
+    }
+
+    .header {
+        width: 95%;
+        max-width: 1300px;
+        margin: 0 auto 28px auto;
+        padding: 22px;
+        color: #fff;
+        text-align: center;
+        border-radius: 16px;
+        font-size: 2.1rem;
+        font-weight: 700;
+        background: rgba(255,255,255,0.12);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+        animation: slideDown 0.6s ease-in-out;
+    }
+
+    .grid-container {
+        width: 95%;
+        max-width: 1300px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+        gap: 35px;
+    }
+
+    .card {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(14px);
+        border-radius: 22px;
+        padding: 40px 30px;
+        text-align: center;
+        color: white;
+        cursor: pointer;
+        transition: .4s;
+        box-shadow: 0 10px 35px rgba(0,0,0,0.25);
+        position: relative;
+        overflow: hidden;
+        animation: fadeIn 0.6s ease-in-out;
+    }
+
+    .card:hover {
+        transform: translateY(-10px) scale(1.03);
+        box-shadow: 0 14px 45px rgba(0,0,0,0.35);
+    }
+
+    .icon-circle {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 18px auto;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: rgba(255,255,255,0.25);
+        backdrop-filter: blur(8px);
+        color: #fff;
+        font-size: 42px;
+    }
+
+    .card h3 {
+        font-size: 1.6rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+
+    .card p {
+        font-size: 1rem;
+        margin-bottom: 22px;
+        opacity: 0.9;
+    }
+
+    .card button {
+        padding: 12px 24px;
+        font-size: 1rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 10px;
+        color: white;
+        background: linear-gradient(135deg, #3b82f6, #0ea5e9);
+        cursor: pointer;
+        transition: 0.35s;
+    }
+
+    .card button:hover {
+        transform: scale(1.08);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+    }
+
+    /* animations */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-25px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+</style>
+
+<div class="header">
+    👋 Hi <span style="color:#ffe600;">{{ username }}</span>, Welcome to <span style="color:#fbbf24;">SCMpertLite</span>
+</div>
+
+<div class="grid-container">
+
+    <!-- Create Shipment -->
+    <div class="card" onclick="window.location.href='/create-shipment'">
+        <div class="icon-circle">📦</div>
+        <h3>Create Shipment</h3>
+        <p>Start a new shipment and track logistics smartly.</p>
+        <button>Create Now</button>
+    </div>
+
+    <!-- Device Stream -->
+    <div class="card" onclick="window.location.href='/device-stream'">
+        <div class="icon-circle">📡</div>
+        <h3>Device Data Stream</h3>
+        <p>Monitor real-time IoT streaming data & conditions.</p>
+        <button>View Stream</button>
+    </div>
+
+</div>
+
+{% endblock %}

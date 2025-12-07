@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+body {
+    background: linear-gradient(135deg, #0663b9, #c3d6ff, #0c3f9d) !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 15px;
+    min-height: 100vh;
+}
+
+.container {
+    width: 95%;
+    max-width: 1100px;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 1.8rem;
+    color: #1a1a1a;
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;          /* enables horizontal scroll on small screens */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    min-width: 850px;          /* prevents breaking on small viewports */
+}
+
+table th, table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 0.95rem;
+}
+
+table th {
+    background: #f5f7fa;
+    color: #333;
+    font-weight: 600;
+}
+
+tr:hover {
+    background-color: #f0f8ff;
+}
+
+.btn-back {
+    display: inline-block;
+    margin-bottom: 15px;
+    background: #0c6efd;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: 0.3s ease;
+}
+
+.btn-back:hover {
+    background: #004ecb;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    .container {
+        padding: 20px;
+    }
+
+    table th, table td {
+        padding: 10px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn-back {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+}
+</style>
+
+<div class="container">
+
+    <a href="/dashboard" class="btn-back">← Back to Dashboard</a>
+
+    <h2>All Shipments</h2>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Shipment Number</th>
+                    <th>Device ID</th>
+                    <th>Container Number</th>
+                    <th>Goods Type</th>
+                    <th>Expected Delivery</th>
+                    <th>Route Details</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for s in shipments %}
+                <tr>
+                    <td>{{ s["shipment_number"] }}</td>
+                    <td>{{ s["device_id"] }}</td>
+                    <td>{{ s.get("container_number", "-") }}</td>
+                    <td>{{ s.get("goods_type", "-") }}</td>
+                    <td>{{ s.get("expected_delivery", "-") }}</td>
+                    <td>{{ s.get("route_details","-") }}</td>
+                    <td>{{ s.get("description", "-") }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

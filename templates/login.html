@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login Page</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #0663b9, #c3d6ff, #0c3f9d);
+      padding: 20px;
+    }
+
+    .container {
+      display: flex;
+      width: 95%;
+      max-width: 850px;
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .left {
+      flex: 1;
+      padding: 50px 35px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: #f9fafc;
+    }
+
+    .left h2 {
+      margin-bottom: 20px;
+      color: #333;
+      text-align: center;
+      font-size: 1.8rem;
+    }
+
+    .input-group {
+      margin-bottom: 18px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 1rem;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    .input-group input:focus {
+      border-color: #6a11cb;
+      box-shadow: 0 0 5px rgba(106, 17, 203, 0.3);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.05rem;
+      color: #fff;
+      cursor: pointer;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: linear-gradient(135deg, #5d0cc0, #1f6afc);
+    }
+
+    .google-btn {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .google-btn:hover {
+      background: #f1f1f1;
+    }
+
+    .google-btn img {
+      width: 20px;
+    }
+
+    .right {
+      flex: 1;
+      background: linear-gradient(135deg, #2575fc, #6a11cb);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 40px 30px;
+    }
+
+    .signup-btn {
+      padding: 12px 30px;
+      background: #fff;
+      color: #2575fc;
+      border-radius: 25px;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .signup-btn:hover {
+      background: #ececec;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="left">
+      <h2>Login to Your Account</h2>
+
+      <form method="post" action="/login">
+        {% if forgot_stage == "email" %}
+          <div class="input-group">
+            <input type="email" name="forgot_email" placeholder="Enter your email" required />
+          </div>
+          <input type="hidden" name="forgot_action" value="send_otp" />
+          <button type="submit" class="btn">Send OTP</button>
+
+        {% elif forgot_stage == "otp" %}
+          <input type="hidden" name="forgot_email" value="{{forgot_email}}">
+          <div class="input-group">
+            <input type="text" name="forgot_otp" placeholder="Enter OTP" maxlength="6" required />
+          </div>
+          <div class="input-group">
+            <input type="password" name="new_password" placeholder="Enter New Password" required />
+          </div>
+          <input type="hidden" name="forgot_action" value="verify_otp" />
+          <button type="submit" class="btn">Reset Password</button>
+
+        {% else %}
+          <div class="input-group">
+            <input type="email" name="email" placeholder="Email" autocomplete="off" required />
+          </div>
+          <div class="input-group">
+            <input type="password" name="password" placeholder="Password" autocomplete="off" required />
+          </div>
+
+          <!-- Google reCAPTCHA -->
+          <div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_SITE_KEY }}" style="margin-bottom: 15px;"></div>
+
+          <button type="submit" class="btn">Login</button>
+
+          <p style="text-align:center; margin-top:10px;">
+            <a href="/login?forgot=true" style="color:#2575fc; text-decoration:none;">Forgot Password?</a>
+          </p>
+
+        {% endif %}
+      </form>
+
+      <p style="text-align:center; margin-top:8px;">{{message}}</p>
+
+      <button class="google-btn" onclick="window.location.href='/login/google'">
+        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google Logo" />
+        Sign in with Google
+      </button>
+    </div>
+
+    <div class="right">
+      <h2>New Here?</h2>
+      <p>If you don’t have an account yet, sign up below to get started!</p>
+      <button class="signup-btn" onclick="window.location.href='/signup'">Sign Up</button>
+    </div>
+  </div>
+
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+<script>
+  window.addEventListener("pageshow", function(event) {
+    if (event.persisted) {
+      window.location.reload();
+    }
+  });
+</script>
+
+</body>
+</html>

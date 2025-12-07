@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+.account-container {
+    width: 95%;
+    max-width: 950px;
+    margin: 20px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 18px;
+    box-shadow: 0 6px 22px rgba(0,0,0,0.15);
+    animation: fadeIn .5s ease-in-out;
+}
+
+.account-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.account-header h2 {
+    font-size: 2rem;
+    color: #1e3a8a;
+    font-weight: 600;
+}
+
+.profile-pic {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid #1e3a8a;
+    object-fit: cover;
+    display: block;
+    margin: 20px auto 30px auto;
+}
+
+.info-box {
+    margin-top: 15px;
+}
+
+.info-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+    padding: 8px 0;
+    align-items: center;
+}
+
+.info-label {
+    width: 200px;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #1e293b;
+}
+
+.info-value {
+    font-size: 1rem;
+    color: #374151;
+}
+
+.reset-btn {
+    margin-top: 25px;
+    width: 100%;
+    padding: 14px;
+    background: #1e3a8a;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.reset-btn:hover {
+    background: #102a61;
+    transform: scale(1.03);
+}
+
+.hidden-section {
+    margin-top: 25px;
+    padding: 20px;
+    background: #f1f5f9;
+    border-radius: 12px;
+    display: none;
+}
+
+#info-message {
+    color: green;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.input-box {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #94a3b8;
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+
+.action-btn {
+    padding: 12px 18px;
+    background: #1e3a8a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: .3s;
+}
+
+.action-btn:hover {
+    background: #102a61;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px);}
+    to { opacity: 1; transform: translateY(0);}
+}
+
+/* Responsive Layout */
+@media (max-width: 768px) {
+    .info-label {
+        width: 100%;
+        margin-bottom: 3px;
+        font-size: 0.95rem;
+    }
+    .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .account-header h2 {
+        font-size: 1.6rem;
+    }
+    .profile-pic {
+        width: 100px;
+        height: 100px;
+    }
+}
+</style>
+
+
+<div class="account-container">
+
+    <div class="account-header">
+        <h2>Account Information</h2>
+    </div>
+
+    {% if user.picture %}
+        <img src="{{ user.picture }}" class="profile-pic">
+    {% else %}
+        <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="profile-pic">
+    {% endif %}
+
+    <div class="info-box">
+
+        <div class="info-row">
+            <div class="info-label">Full Name:</div>
+            <div class="info-value">{{ user.name }}</div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Email:</div>
+            <div class="info-value">{{ user.email }}</div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Account Type:</div>
+            <div class="info-value">
+                {% if user.auth_provider == "google" %}
+                    Google Account
+                {% else %}
+                    Local Account
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Password:</div>
+            <div class="info-value">
+                {% if user.auth_provider == "google" %}
+                    Not Required (Google Login)
+                {% else %}
+                    ********
+                {% endif %}
+            </div>
+        </div>
+
+        {% if user.auth_provider != "google" %}
+            <button id="reset-btn" class="reset-btn" onclick="sendOTP()">Reset Password</button>
+        {% endif %}
+
+        <div id="reset-section" class="hidden-section">
+            <h3 style="margin-bottom:12px;color:#1e3a8a;">Reset Password</h3>
+            <p id="info-message"></p>
+
+            <input type="text" id="otp" class="input-box" placeholder="Enter OTP">
+            <input type="password" id="new-password" class="input-box" placeholder="Enter New Password">
+
+            <button class="action-btn" onclick="verifyAndUpdate()">Verify & Update Password</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+function sendOTP() {
+    if (!confirm("Are you sure you want to update your password?")) return;
+
+    fetch("/account", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ action: "send_otp" })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("info-message").innerText = data.message;
+        document.getElementById("reset-btn").style.display = "none";
+        document.getElementById("reset-section").style.display = "block";
+    });
+}
+
+function verifyAndUpdate() {
+    let otp = document.getElementById("otp").value;
+    let new_pw = document.getElementById("new-password").value;
+
+    if (!otp || !new_pw) {
+        document.getElementById("info-message").innerText = "Please enter OTP and Password.";
+        document.getElementById("info-message").style.color = "red";
+        return;
+    }
+
+    fetch("/account", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ action: "verify_and_update", otp: otp, password: new_pw })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("info-message").innerText = data.message;
+        if (data.success) {
+            document.getElementById("info-message").style.color = "green";
+            setTimeout(() => window.location.reload(), 1500);
+        } else {
+            document.getElementById("info-message").style.color = "red";
+        }
+    });
+}
+</script>
+
+{% endblock %}

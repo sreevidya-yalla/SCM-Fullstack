@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Create Shipment</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0663b9, #c3d6ff, #0c3f9d);
+      margin: 0;
+      padding: 25px;
+    }
+
+    .container {
+      width: 95%;
+      max-width: 900px;
+      background: #fff;
+      margin: auto;
+      padding: 30px 35px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+      color: #000;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 50px;
+      width: 100%;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+      display: block;
+      color: #333;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cfcfcf;
+      border-radius: 6px;
+      background: #f7f7f7;
+      font-size: 0.95rem;
+    }
+
+    textarea {
+      height: 60px;
+      resize: none;
+    }
+
+    .btn-row {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 22px;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      border: none;
+      background: #0c6efd;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 0 8px;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #004ecb;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+
+</head>
+<body>
+
+<div class="container">
+  <h2>Create Shipment</h2>
+
+  <form action="/shipment" method="post">
+    <div class="grid">
+
+      <div>
+        <label>Shipment Number*</label>
+        <input type="text" name="shipment_number" required>
+      </div>
+
+      <div>
+        <label>Container Number*</label>
+        <input type="text" name="container_number" required>
+      </div>
+
+      <div>
+        <label>Route Details*</label>
+        <select name="route_details" required>
+          <option value="">Select Route</option>
+          <option>Chennai → Bengaluru</option>
+          <option>Chennai → Hyderabad</option>
+          <option>Mumbai → Delhi</option>
+          <option>Hyderabad → Pune</option>
+          <option>Bengaluru → Mumbai</option>
+          <option>Delhi → Kolkata</option>
+          <option>Kerala → Chennai</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Goods Type*</label>
+        <select name="goods_type" required>
+           <option value="">Select Goods</option>
+           <option>Electronics</option>
+           <option>Pharma</option>
+           <option>Food & Beverages</option>
+           <option>Automobile Parts</option>
+           <option>Furniture</option>
+           <option>Cosmetics</option>
+           <option>Clothing & Apparel</option>
+           <option>Medical Equipment</option>
+           <option>Industrial Machinery</option>
+           <option>FMCG Products</option>
+           <option>Chemicals</option>
+           <option>Textiles</option>
+           <option>Perishable Goods</option>
+           <option>Consumer Durables</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Select Device*</label>
+        <select name="device_id" required>
+          <option value="">-- Select Available Device --</option>
+          {% for device in devices %}
+              <option value="{{ device.device_id }}">{{ device.device_id }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label>Expected Delivery Date*</label>
+        <input type="date" name="expected_delivery" required>
+      </div>
+
+      <div>
+        <label>PO Number*</label>
+        <input type="text" name="po_number" required>
+      </div>
+
+      <div>
+        <label>Delivery Number*</label>
+        <input type="text" name="delivery_number" required>
+      </div>
+
+      <div>
+        <label>NDC Number*</label>
+        <input type="text" name="ndc_number" required>
+      </div>
+
+      <div>
+        <label>Batch Id*</label>
+        <input type="text" name="batch_id" required>
+      </div>
+
+      <div>
+        <label>Serial Number*</label>
+        <input type="text" name="serial_number" required>
+      </div>
+
+      <div>
+        <label>Description*</label>
+        <textarea name="description" required></textarea>
+      </div>
+
+    </div>
+
+    <div class="btn-row">
+      <button type="submit">CREATE SHIPMENT</button>
+      <button type="reset">CLEAR DETAILS</button>
+    </div>
+
+  </form>
+</div>
+
+</body>
+</html>
