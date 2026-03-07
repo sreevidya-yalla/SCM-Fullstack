@@ -38,6 +38,7 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    /* Left - Login Section */
     .left {
       flex: 1;
       padding: 50px 35px;
@@ -112,6 +113,7 @@
       width: 20px;
     }
 
+    /* Right panel */
     .right {
       flex: 1;
       background: linear-gradient(135deg, #2575fc, #6a11cb);
@@ -122,6 +124,16 @@
       align-items: center;
       text-align: center;
       padding: 40px 30px;
+    }
+
+    .right h2 {
+      font-size: 1.9rem;
+      margin-bottom: 15px;
+    }
+
+    .right p {
+      margin-bottom: 20px;
+      font-size: 1rem;
     }
 
     .signup-btn {
@@ -140,6 +152,16 @@
       background: #ececec;
       transform: scale(1.05);
     }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .container {
+        flex-direction: column;
+      }
+      .right {
+        padding: 35px 25px;
+      }
+    }
   </style>
 </head>
 
@@ -147,6 +169,7 @@
 
   <div class="container">
 
+    <!-- Left Side (Login Form) -->
     <div class="left">
       <h2>Login to Your Account</h2>
 
@@ -176,10 +199,6 @@
           <div class="input-group">
             <input type="password" name="password" placeholder="Password" autocomplete="off" required />
           </div>
-
-          <!-- Google reCAPTCHA -->
-          <div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_SITE_KEY }}" style="margin-bottom: 15px;"></div>
-
           <button type="submit" class="btn">Login</button>
 
           <p style="text-align:center; margin-top:10px;">
@@ -197,14 +216,13 @@
       </button>
     </div>
 
+    <!-- Right Side -->
     <div class="right">
       <h2>New Here?</h2>
       <p>If you don’t have an account yet, sign up below to get started!</p>
       <button class="signup-btn" onclick="window.location.href='/signup'">Sign Up</button>
     </div>
   </div>
-
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 <script>
   window.addEventListener("pageshow", function(event) {
