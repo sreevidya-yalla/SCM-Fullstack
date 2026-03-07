@@ -1,72 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Device Data Stream</title>
 
 <style>
-*{
+
+* {
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family: "Poppins", sans-serif;
+    font-family:"Poppins", sans-serif;
 }
 
 body {
-    background: linear-gradient(135deg,#dbeafe,#bfdbfe,#93c5fd);
-    padding: 25px;
+    background:linear-gradient(135deg,#dbeafe,#bfdbfe,#93c5fd);
+    padding:25px;
 }
 
 .title {
-    text-align: center;
-    font-size: 1.9rem;
-    font-weight: 700;
-    margin-bottom: 18px;
+    text-align:center;
+    font-size:1.9rem;
+    font-weight:700;
+    margin-bottom:18px;
     color:#1e3a8a;
 }
 
 .container {
-    width: 95%;
-    max-width: 1200px;
-    background: #ffffff;
-    margin: 0 auto;
-    padding: 30px;
-    border-radius: 14px;
-    box-shadow: 0 6px 25px rgba(0,0,0,0.18);
-    animation: fadeIn 0.6s ease-in-out;
+    width:95%;
+    max-width:1200px;
+    background:#ffffff;
+    margin:0 auto;
+    padding:30px;
+    border-radius:14px;
+    box-shadow:0 6px 25px rgba(0,0,0,0.18);
+    animation:fadeIn 0.6s ease-in-out;
 }
 
 label {
-    font-size: 1rem;
-    font-weight: 600;
+    font-size:1rem;
+    font-weight:600;
     color:#1e293b;
 }
 
 select {
-    padding: 12px;
-    font-size: 1rem;
-    width: 280px;
-    border-radius: 10px;
+    padding:12px;
+    font-size:1rem;
+    width:280px;
+    border-radius:10px;
     border:1px solid #cbd5e1;
     background:#f8fafc;
-    margin-top: 10px;
+    margin-top:10px;
     outline:none;
 }
 
-select:focus{
+select:focus {
     border-color:#1e3a8a;
     box-shadow:0 0 5px rgba(30,58,138,0.3);
 }
 
 .table-wrapper {
-    overflow-x: auto;
-    margin-top: 25px;
+    overflow-x:auto;
+    margin-top:25px;
 }
 
 table {
-    width: 100%;
-    border-collapse: collapse;
+    width:100%;
+    border-collapse:collapse;
 }
 
 th, td {
@@ -91,31 +93,32 @@ tr:hover td {
 }
 
 #messageBox {
-    margin-top: 15px;
-    font-size: 1rem;
+    margin-top:15px;
+    font-size:1rem;
     font-weight:600;
     color:#dc2626;
 }
 
-/* Animation */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {opacity:0; transform:translateY(20px);}
+    to {opacity:1; transform:translateY(0);}
 }
 
-/* Responsive */
-@media (max-width:768px){
+@media (max-width:768px) {
+
     select {
-        width: 100%;
+        width:100%;
     }
 
     .title {
-        font-size: 1.6rem;
+        font-size:1.6rem;
     }
-}
-</style>
 
+}
+
+</style>
 </head>
+
 
 <body>
 
@@ -123,66 +126,114 @@ tr:hover td {
 
 <div class="container">
 
-    <label>Select Device ID:</label><br>
+<label>Select Device ID:</label><br>
 
-    <select id="deviceSelect" onchange="loadSelectedDevice()">
-        <option value="">Select Device</option>
-        {% for d in devices %}
-        <option value="{{ d.device_id }}">{{ d.device_id }}</option>
-        {% endfor %}
-    </select>
+<select id="deviceSelect" onchange="loadSelectedDevice()">
 
-    <div id="messageBox"></div>
+<option value="">All Devices</option>
 
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>Device ID</th>
-                    <th>Battery</th>
-                    <th>Temperature</th>
-                    <th>Route From</th>
-                    <th>Route To</th>
-                    <th>Timestamp</th>
-                </tr>
-            </thead>
-            <tbody id="rows"></tbody>
-        </table>
-    </div>
+{% for d in devices %}
+<option value="{{ d.device_id }}">{{ d.device_id }}</option>
+{% endfor %}
+
+</select>
+
+<div id="messageBox"></div>
+
+<div class="table-wrapper">
+
+<table>
+
+<thead>
+<tr>
+<th>Device ID</th>
+<th>Battery</th>
+<th>Temperature</th>
+<th>Route From</th>
+<th>Route To</th>
+<th>Timestamp</th>
+</tr>
+</thead>
+
+<tbody id="rows"></tbody>
+
+</table>
 
 </div>
 
+</div>
+
+
 <script>
+
 let ws;
 let selectedID = null;
+
 let assignedDevices = {{ assigned_ids | default([]) | tojson }};
 
-// WebSocket start
+
+
+    //   Load all devices on page load
+
+async function loadDefaultDevices(){
+
+    const resp = await fetch("/device-stream/history");
+    const data = await resp.json();
+
+    const rows = document.getElementById("rows");
+    rows.innerHTML = "";
+
+    const filtered = data.filter(d => assignedDevices.includes(d.Device_ID));
+
+    filtered.reverse().forEach(d => addRow(d));
+}
+
+
+
+    //   WebSocket connection
+
 ws = new WebSocket(`ws://${location.host}/ws/device-stream`);
 
 ws.onmessage = (event) => {
+
     let d = JSON.parse(event.data);
 
-    if (!selectedID || d.Device_ID !== selectedID) return;
+    if(!assignedDevices.includes(d.Device_ID))
+        return;
+
+    if(selectedID && d.Device_ID !== selectedID)
+        return;
 
     addRow(d);
 };
 
-async function loadSelectedDevice() {
-    const selected = document.getElementById("deviceSelect").value;
 
-    if (!selected) {
+//   Device selection
+
+async function loadSelectedDevice(){
+
+    const selected = document.getElementById("deviceSelect").value;
+    const rows = document.getElementById("rows");
+
+    if(!selected){
+
         selectedID = null;
-        showMessage("Please select a device.");
-        document.getElementById("rows").innerHTML = "";
+
+        showMessage("");
+
+        loadDefaultDevices();
+
         return;
     }
 
     selectedID = parseInt(selected);
 
-    if (!assignedDevices.includes(selectedID)) {
+    if(!assignedDevices.includes(selectedID)){
+
         showMessage("⚠ No data available for this device (not assigned to any shipment).");
-        document.getElementById("rows").innerHTML = "";
+
+        rows.innerHTML = "";
+
         return;
     }
 
@@ -193,29 +244,48 @@ async function loadSelectedDevice() {
 
     const filtered = data.filter(r => r.Device_ID === selectedID);
 
-    const rows = document.getElementById("rows");
     rows.innerHTML = "";
 
     filtered.reverse().forEach(d => addRow(d));
 }
 
-function addRow(d) {
+
+
+//   Add row to table
+
+function addRow(d){
+
     let row = document.createElement("tr");
+
     row.innerHTML = `
         <td>${d.Device_ID}</td>
-        <td>${d.Battery_Level}</td>
+        <td>${d.Battery_Level}%</td>
         <td>${d.First_Sensor_temperature} °C</td>
         <td>${d.Route_From}</td>
         <td>${d.Route_To}</td>
         <td>${new Date().toLocaleString()}</td>
     `;
+
     document.getElementById("rows").prepend(row);
 }
 
-function showMessage(msg) {
+
+//   Show message
+
+function showMessage(msg){
+
     document.getElementById("messageBox").innerHTML = msg;
+
 }
+
+
+    
+//   Page load
+
+window.onload = loadDefaultDevices;
+
 </script>
+
 
 </body>
 </html>
