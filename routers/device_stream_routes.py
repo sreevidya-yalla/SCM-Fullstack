@@ -20,17 +20,9 @@ async def device_stream(request: Request):
     guard = await require_user(request)
     if not guard:
         return RedirectResponse("/login", 303)
-
-    # Async: fetch all devices
-    all_devices = await devices.find({}, {"_id": 0}).to_list(length=None)
-
-    # Async: fetch assigned devices only
-    assigned_docs = await devices.find(
-        {"status": "assigned"},
-        {"_id": 0, "device_id": 1}
-    ).to_list(length=None)
-
-    assigned = [d["device_id"] for d in assigned_docs]
+    
+    all_devices = list(devices.find({}, {"_id": 0}))    
+    assigned = [d["device_id"] for d in devices.find({"status": "assigned"}, {"_id": 0})]
 
     return templates.TemplateResponse("device_stream.html", {
         "request": request,
@@ -48,8 +40,8 @@ async def device_stream_history(request: Request):
     if not guard:
         return JSONResponse({"error": "Unauthorized"}, status_code=401)
 
-    # Async: fetch all past device stream entries
-    data = await device_stream_collection.find({}, {"_id": 0}).to_list(length=None)
+    # Fetch all past device stream entries
+    data = list(device_stream_collection.find({}, {"_id": 0}))
     return JSONResponse(data)
 
 
@@ -66,5 +58,5 @@ async def ws_device_stream(ws: WebSocket):
             await asyncio.sleep(1)  # Keep socket alive
     except WebSocketDisconnect:
         connected_websockets.discard(ws)
-    except Exception:
+    except Exception as e:
         connected_websockets.discard(ws)
