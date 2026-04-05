@@ -11,14 +11,22 @@ templates = Jinja2Templates(directory="templates")
 temp_users = {}
 
 @router.get("/signup")
-def signup_page(request: Request):
+async def signup_page(request: Request):
     return templates.TemplateResponse("signup.html", {"request": request})
 
-@router.post("/signup")
-async def signup(request: Request, name: str = Form(...), email: str = Form(...), password: str = Form(...), otp: str = Form(None)):
 
+@router.post("/signup")
+async def signup(
+    request: Request,
+    name: str = Form(...),
+    email: str = Form(...),
+    password: str = Form(...),
+    otp: str = Form(None)
+):
+
+    # --------------- FIRST STEP (SEND OTP) ---------------
     if not otp:
-        existing_user = users_collection.find_one({"email": email})
+        existing_user = await users_collection.find_one({"email": email})
         if existing_user:
             return templates.TemplateResponse("signup.html", {
                 "request": request,
@@ -28,13 +36,14 @@ async def signup(request: Request, name: str = Form(...), email: str = Form(...)
         
         generated_otp = str(random.randint(100000, 999999))
 
-        # Store user temporarily in memory
+        # Store temporarily in memory
         temp_users[email] = {
             "name": name,
             "email": email,
             "password": password,
             "otp": generated_otp
         }
+
         await send_email("OTP Verification", email, f"Your OTP is {generated_otp}")
 
         return templates.TemplateResponse("signup.html", {
@@ -44,10 +53,10 @@ async def signup(request: Request, name: str = Form(...), email: str = Form(...)
             "email": email
         })
 
+    # --------------- SECOND STEP (VERIFY OTP) ---------------
     user_data = temp_users.get(email)
 
     if not user_data:
-        # If not found in temp memory (app restarted / expired)
         return templates.TemplateResponse("signup.html", {
             "request": request,
             "message": "⚠️ Session expired or invalid. Please sign up again.",
@@ -55,15 +64,14 @@ async def signup(request: Request, name: str = Form(...), email: str = Form(...)
         })
 
     if user_data["otp"] == otp:
-        # Move verified user to main collection
-        users_collection.insert_one({
+
+        await users_collection.insert_one({
             "name": user_data["name"],
             "email": user_data["email"],
             "password": user_data["password"],
             "auth_provider": "local"
         })
 
-        # Remove temporary user
         del temp_users[email]
 
         return templates.TemplateResponse("signup.html", {
@@ -71,13 +79,13 @@ async def signup(request: Request, name: str = Form(...), email: str = Form(...)
             "message": "🎉 Signup successful! You can now login.",
             "otp_stage": False
         })
-    else:
-        # OTP is incorrect
-        return templates.TemplateResponse("signup.html", {
-            "request": request,
-            "message": "❌ Invalid OTP. Please try again.",
-            "otp_stage": True,
-            "email": email,
-            "name": name,
-            "password": password
-        })
+
+    # --------------- WRONG OTP ---------------
+    return templates.TemplateResponse("signup.html", {
+        "request": request,
+        "message": "❌ Invalid OTP. Please try again.",
+        "otp_stage": True,
+        "email": email,
+        "name": name,
+        "password": password
+    })
