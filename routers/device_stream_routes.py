@@ -13,7 +13,7 @@ templates = Jinja2Templates(directory="templates")
 
 
 # -----------------------------------------
-# PAGE ROUTE (Loads HTML)
+# PAGE ROUTE 
 # -----------------------------------------
 @router.get("/device-stream")
 async def device_stream(request: Request):
@@ -21,10 +21,10 @@ async def device_stream(request: Request):
     if not guard:
         return RedirectResponse("/login", 303)
 
-    # Async: fetch all devices
+    # Fetch all devices
     all_devices = await devices.find({}, {"_id": 0}).to_list(length=None)
 
-    # Async: fetch assigned devices only
+    # Fetch assigned devices only
     assigned_docs = await devices.find(
         {"status": "assigned"},
         {"_id": 0, "device_id": 1}
@@ -48,7 +48,7 @@ async def device_stream_history(request: Request):
     if not guard:
         return JSONResponse({"error": "Unauthorized"}, status_code=401)
 
-    # Async: fetch all past device stream entries
+    # Fetch all past device stream entries
     data = await device_stream_collection.find({}, {"_id": 0}).to_list(length=None)
     return JSONResponse(data)
 
@@ -62,8 +62,16 @@ async def ws_device_stream(ws: WebSocket):
     connected_websockets.add(ws)
 
     try:
+        #  STEP 1: SEND DEFAULT DATA IMMEDIATELY
+        initial_data = await device_stream_collection.find({}, {"_id": 0}) \
+            .sort("_id", -1).limit(10).to_list(10)
+
+        await ws.send_json(initial_data)
+
+        #  STEP 2: KEEP CONNECTION ALIVE
         while True:
-            await asyncio.sleep(1)  # Keep socket alive
+            await asyncio.sleep(1)
+
     except WebSocketDisconnect:
         connected_websockets.discard(ws)
     except Exception:
