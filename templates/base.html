@@ -70,6 +70,7 @@
       background: rgba(255,255,255,0.25);
     }
 
+<<<<<<< HEAD
     /* Logout Button */
     .logout {
       margin: 20px 12px;
@@ -89,6 +90,25 @@
     }
 
     .logout a:hover {
+=======
+    /* ✅ Logout Button */
+    .logout-btn {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      width: 200px;
+      padding: 12px;
+      background: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .logout-btn:hover {
+>>>>>>> e46092b (Added show/hide password feature)
       background: #dc2626;
     }
 
@@ -127,7 +147,6 @@
 
       .sidebar {
         transform: translateX(-100%);
-        position: fixed;
       }
 
       .content {
@@ -180,11 +199,18 @@
       </div>
     </div>
 
+<<<<<<< HEAD
     <!-- Logout Button -->
     <div class="logout">
       <a href="/logout"> Logout</a>
     </div>
 
+=======
+    <!--  Logout Button -->
+    <a href="/logout" onclick="return confirm('Are you sure you want to logout?')">
+      <button class="logout-btn">Logout</button>
+    </a>
+>>>>>>> e46092b (Added show/hide password feature)
   </div>
 
   <!-- Content -->
@@ -211,8 +237,13 @@ function toggleSidebar() {
   const bar = document.getElementById("sidebar");
   bar.style.transform =
     bar.style.transform === "translateX(0%)"
+<<<<<<< HEAD
     ? "translateX(-100%)"
     : "translateX(0%)";
+=======
+      ? "translateX(-100%)"
+      : "translateX(0%)";
+>>>>>>> e46092b (Added show/hide password feature)
 }
 
 </script>
