@@ -13,6 +13,13 @@ templates = Jinja2Templates(directory="templates")
 reset_otps = {}
 
 
+
+
+@router.get("/logout")
+async def logout(request: Request):
+    request.session.clear()
+    return RedirectResponse(url="/login", status_code=303)
+
 @router.get("/", response_class=HTMLResponse)
 def login_page(request: Request):
     return templates.TemplateResponse("login.html", {
@@ -45,6 +52,11 @@ async def login(
     g_recaptcha_response: str | None = Form(None, alias="g-recaptcha-response")
 ):
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> e46092b (Added show/hide password feature)
     # ========== RECAPTCHA VALIDATION  ==========
     if not forgot_action:
         if not g_recaptcha_response: 
