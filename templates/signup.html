@@ -161,6 +161,20 @@
     @media (max-width: 480px) {
       .right h2, .left h2 { font-size: 1.5rem; }
     }
+
+    .password-container {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 0.75rem;   
+  font-weight: 600;
+}
   </style>
 </head>
 
@@ -199,9 +213,10 @@
             <input type="email" name="email" id="email" placeholder="Email Address" required />
           </div>
 
-          <div class="input-group">
+         <div class="input-group password-container">
             <input type="password" name="password" id="password" placeholder="Password" onkeyup="checkPassword()" required />
-          </div>
+            <span class="toggle-password" onclick="togglePassword('password', this)">Show</span>
+         </div>
 
           <div class="password-msg" id="passwordMsg"></div>
 
@@ -228,6 +243,18 @@
       } else {
         msg.textContent = "❌ Weak password — include upper & lower letters, numbers & symbols";
         msg.className = "password-msg weak";
+      }
+    }
+      
+    function togglePassword(id, el) {
+      const input = document.getElementById(id);
+
+      if (input.type === "password") {
+        input.type = "text";
+        el.textContent = "Hide";
+      } else {
+        input.type = "password";
+        el.textContent = "Show";
       }
     }
   </script>
