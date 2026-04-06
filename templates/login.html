@@ -38,7 +38,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Left - Login Section */
     .left {
       flex: 1;
       padding: 50px 35px;
@@ -113,7 +112,6 @@
       width: 20px;
     }
 
-    /* Right panel */
     .right {
       flex: 1;
       background: linear-gradient(135deg, #2575fc, #6a11cb);
@@ -124,16 +122,6 @@
       align-items: center;
       text-align: center;
       padding: 40px 30px;
-    }
-
-    .right h2 {
-      font-size: 1.9rem;
-      margin-bottom: 15px;
-    }
-
-    .right p {
-      margin-bottom: 20px;
-      font-size: 1rem;
     }
 
     .signup-btn {
@@ -151,16 +139,19 @@
     .signup-btn:hover {
       background: #ececec;
       transform: scale(1.05);
+        }
+    .password-container {
+      position: relative;
     }
 
-    /* Responsive */
-    @media (max-width: 900px) {
-      .container {
-        flex-direction: column;
-      }
-      .right {
-        padding: 35px 25px;
-      }
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
     }
   </style>
 </head>
@@ -169,7 +160,6 @@
 
   <div class="container">
 
-    <!-- Left Side (Login Form) -->
     <div class="left">
       <h2>Login to Your Account</h2>
 
@@ -196,9 +186,14 @@
           <div class="input-group">
             <input type="email" name="email" placeholder="Email" autocomplete="off" required />
           </div>
-          <div class="input-group">
-            <input type="password" name="password" placeholder="Password" autocomplete="off" required />
+          <div class="input-group password-container">
+            <input type="password" id="password" name="password" placeholder="Password" autocomplete="off" required />
+            <span class="toggle-password" onclick="togglePassword('password', this)">Show</span>
           </div>
+
+          <!-- Google reCAPTCHA -->
+          <div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_SITE_KEY }}" style="margin-bottom: 15px;"></div>
+
           <button type="submit" class="btn">Login</button>
 
           <p style="text-align:center; margin-top:10px;">
@@ -216,13 +211,16 @@
       </button>
     </div>
 
-    <!-- Right Side -->
     <div class="right">
       <h2>New Here?</h2>
+      <br>
       <p>If you don’t have an account yet, sign up below to get started!</p>
+      <br>
       <button class="signup-btn" onclick="window.location.href='/signup'">Sign Up</button>
     </div>
   </div>
+
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 <script>
   window.addEventListener("pageshow", function(event) {
@@ -230,6 +228,19 @@
       window.location.reload();
     }
   });
+
+  function togglePassword(id, el) {
+    const input = document.getElementById(id);
+
+    if (input.type === "password") {
+      input.type = "text";
+      el.textContent = "Hide";
+    } else {
+      input.type = "password";
+      el.textContent = "Show";
+    }
+  }
+
 </script>
 
 </body>
